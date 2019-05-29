@@ -23,7 +23,7 @@
               <td>{{item.nid}}</td>
               <td>{{item.ntitle}}</td>
               <td><img :src="CONSTANT.URL+item.coverimg" alt=""></td>
-              <td><button class="btn btn-info">修改新闻</button> <button class="btn btn-info">删除新闻</button></td>
+              <td><button class="btn btn-info" @click="getNews(item)">修改新闻</button> <button class="btn btn-danger" @click="deleteNews(item.nid)">删除新闻</button></td>
             </tr>
             </tbody>
           </table>
@@ -118,7 +118,7 @@
             </div>
           </div>
           <div class="modal-footer">
-            <button type="button" class="btn btn-primary" @click="updateBanner()">保存</button>
+            <button type="button" class="btn btn-primary" @click="updateNews()">保存</button>
             <button type="button" class="btn btn-secondary" data-dismiss="modal">关闭</button>
           </div>
         </div>
@@ -147,6 +147,7 @@
           imgFile:''
         },
         update:{
+          nid:0,
           ntitle:'',
           coverimg:'',
           ndetail:'',
@@ -223,8 +224,9 @@
       addNews()
       {
         let data = new FormData();
-        data.append("href",this.add.href);
-        data.append("imgFile",this.add.imgFile);
+        if(this.add.imgFile!=="" ||this.add.imgFile!==null) {
+          data.append("imgFile", this.add.imgFile);
+        }
         data.append("author",this.add.author);
         data.append("ntitle",this.add.ntitle);
         data.append("ndetail",this.add.ndetail);
@@ -248,7 +250,76 @@
               })
             }
           })
-      }, 
+      },
+      getNews(data)
+      {
+        this.update=data;
+        this.updateeditor.txt.html(this.update.ndetail);
+        this.openModal("#updateModal");
+      },
+      /**
+       * 更新新闻信息
+       */
+      updateNews()
+      {
+        let data = new FormData();
+        if(this.update.imgFile!=="" ||this.update.imgFile!==null) {
+          data.append("imgFile", this.update.imgFile);
+        }
+        data.append("coverimg",this.update.coverimg);
+        data.append("author",this.update.author);
+        data.append("ntitle",this.update.ntitle);
+        data.append("ndetail",this.update.ndetail);
+        data.append("nid",this.update.nid);
+
+        let config = {
+          //添加请求头
+          headers: { "Content-Type": "multipart/form-data" },
+        };
+        this.axios.post("/admin/news/update",data,config)
+          .then((json)=>{
+            if(json.data.code===CONSTANT.STATUSCODE.SUCCESS)
+            {
+              CONSTANT.MESSAGEBOX(json.data.message,"success",()=>{
+                jQuery('#updateModal').modal('hide');
+                this.getNewsList();
+              })
+            }
+            else
+            {
+              CONSTANT.MESSAGEBOX(json.data.message,"error",()=>{
+                jQuery('#updateModal').modal('hide');
+              })
+            }
+          })
+
+      },
+      /**
+       * 删除新闻
+       * @param nid
+       */
+      deleteNews(nid)
+      {
+        let flag = confirm("您确定要删除编号为["+nid+"]的新闻信息吗?");
+        if(flag)
+        {
+          this.axios.get("/admin/news/delete?nid="+nid)
+            .then(json=>{
+              if(json.data.code===CONSTANT.STATUSCODE.SUCCESS)
+              {
+                CONSTANT.MESSAGEBOX(json.data.message,"success",()=>{
+                  this.getNewsList();
+                })
+              }
+              else
+              {
+                CONSTANT.MESSAGEBOX(json.data.message,"error",()=>{
+                  return false;
+                })
+              }
+            })
+        }
+      }
     }
   }
 </script>
