@@ -2,28 +2,26 @@
 <template>
   <div>
     <!-- Page Heading -->
-    <h1 class="h3 mb-4 text-gray-800">新闻管理</h1>
+    <h1 class="h3 mb-4 text-gray-800">二维码管理</h1>
     <div class="row">
       <div class="col-12">
-        <button class="btn btn-info" @click="openModal('#addModal')"><i class="fa fa-newspaper"></i> 添加新闻</button>
+        <button class="btn btn-info" @click="openModal('#addModal')"><i class="fa fa-newspaper"></i> 添加技术研发信息</button>
       </div>
       <div class="col-12" style="padding-top:1rem">
         <div class="table-responsive">
           <table class="table table-hover">
             <thead>
             <tr>
-              <th>新闻编号</th>
-              <th>新闻标题</th>
-              <th>新闻封面图片</th>
+              <th>二维码编号</th>
+              <th>二维码图片</th>
               <th>操作</th>
             </tr>
             </thead>
             <tbody>
             <tr v-for="item in pageData.rows">
-              <td>{{item.nid}}</td>
-              <td>{{item.ntitle}}</td>
-              <td><img :src="CONSTANT.URL+item.coverimg" alt=""></td>
-              <td><button class="btn btn-info" @click="getNews(item)">修改新闻</button> <button class="btn btn-danger" @click="deleteNews(item.nid)">删除新闻</button></td>
+              <td>{{item.qid}}</td>
+              <td><img :src="CONSTANT.URL+item.imgpath" alt=""></td>
+              <td><button class="btn btn-info" @click="getData(item)">修改信息</button> <button class="btn btn-danger" @click="deleteData(item.qid)">删除信息</button></td>
             </tr>
             </tbody>
           </table>
@@ -37,7 +35,7 @@
       <div class="modal-dialog modal-lg" role="document">
         <div class="modal-content">
           <div class="modal-header">
-            <h5 class="modal-title">添加新闻</h5>
+            <h5 class="modal-title">添加二维码</h5>
             <button type="button" class="close" data-dismiss="modal" aria-label="Close">
               <span aria-hidden="true">&times;</span>
             </button>
@@ -46,26 +44,8 @@
             <div class="row">
               <div class="col-12">
                 <div class="form-group">
-                  <label>新闻标题</label>
-                  <input type="text" v-model="add.ntitle" class="form-control" placeholder="请输入新闻标题" />
-                </div>
-              </div>
-              <div class="col-12">
-                <div class="form-group">
-                  <label>新闻封面图片</label>
-                  <input type="file" class="form-control-file" @change="changeAddImage" />
-                </div>
-              </div>
-              <div class="col-12">
-                <div class="form-group">
-                  <label>作者</label>
-                  <input type="text" v-model="add.author" class="form-control" placeholder="请输入新闻作者" />
-                </div>
-              </div>
-              <div class="col-12">
-                <div class="form-group">
-                  <label>新闻详情</label>
-                  <div ref="addeditor" style="text-align:left"></div>
+                  <label>二维码图片</label>
+                  <input type="file" @change="changeAddImage" class="form-control"  />
                 </div>
               </div>
             </div>
@@ -84,7 +64,7 @@
       <div class="modal-dialog modal-lg" role="document">
         <div class="modal-content">
           <div class="modal-header">
-            <h5 class="modal-title">修改轮播</h5>
+            <h5 class="modal-title">修改二维码</h5>
             <button type="button" class="close" data-dismiss="modal" aria-label="Close">
               <span aria-hidden="true">&times;</span>
             </button>
@@ -93,32 +73,15 @@
             <div class="row">
               <div class="col-12">
                 <div class="form-group">
-                  <label>新闻标题</label>
-                  <input type="text" v-model="update.ntitle" class="form-control" placeholder="请输入新闻标题" />
+                  <label>二维码图片</label>
+                  <input type="file" @change="changeUpdateImage" class="form-control"  />
                 </div>
               </div>
-              <div class="col-12">
-                <div class="form-group">
-                  <label>新闻封面图片</label>
-                  <input type="file" class="form-control-file" @change="changeUpdateImage" />
-                </div>
-              </div>
-              <div class="col-12">
-                <div class="form-group">
-                  <label>作者</label>
-                  <input type="text" v-model="update.author" class="form-control" placeholder="请输入新闻作者" />
-                </div>
-              </div>
-              <div class="col-12">
-                <div class="form-group">
-                  <label>新闻详情</label>
-                  <div ref="updateeditor" style="text-align:left"></div>
-                </div>
-              </div>
+
             </div>
           </div>
           <div class="modal-footer">
-            <button type="button" class="btn btn-primary" @click="updateNews()">保存</button>
+            <button type="button" class="btn btn-primary" @click="updateData()">保存</button>
             <button type="button" class="btn btn-secondary" data-dismiss="modal">关闭</button>
           </div>
         </div>
@@ -131,74 +94,33 @@
 
 <script>
   import CONSTANT from "../../assets/js/constant";
-  import E from 'wangeditor'
 
   export default {
-    name: "newsmanager",
+    name: "qrcodemanager",
     data() {
       return {
         pageData: {},
         CONSTANT:CONSTANT,
         add:{
-          ntitle:'',
-          coverimg:'',
-          ndetail:'',
-          author:'',
           imgFile:''
         },
         update:{
-          nid:0,
-          ntitle:'',
-          coverimg:'',
-          ndetail:'',
-          author:'',
+          qid:0,
+          imgpath:'',
           imgFile:''
-        },
-        addeditor:null,
-        updateeditor:null
-
-      }
-    },
-    watch: {
-      isClear (val) {
-        // 触发清除文本域内容
-        if (val) {
-          this.editor.txt.clear()
         }
-      },
-      value (val) {
-        // 使用 v-model 时，设置初始值
-        this.editor.txt.html(val)
+
       }
     },
     mounted() {
       let that = this;
 
-      this.addeditor = new E(this.$refs.addeditor);
-      this.addeditor.customConfig.uploadImgServer=CONSTANT.URL+"/file/upload";
-      this.addeditor.customConfig.uploadFileName="files";
-      this.addeditor.customConfig.onchange=(html)=>{
-        this.add.ndetail=html
-        this.$emit('change', this.add.ndetail)
-      }
-
-      this.updateeditor = new E(this.$refs.updateeditor);
-      this.updateeditor.customConfig.uploadImgServer=CONSTANT.URL+"/file/upload";
-      this.updateeditor.customConfig.uploadFileName="files";
-      this.updateeditor.customConfig.onchange=(html)=>{
-        that.update.ndetail=html
-        this.$emit('change', this.update.ndetail)
-      }
-
-      this.addeditor.create();
-      this.updateeditor.create();
-
-      this.getNewsList();
+      this.getList();
     },
     methods:{
-      getNewsList()
+      getList()
       {
-        this.axios.get("/admin/news/selectAdminPageInfo")
+        this.axios.get("/admin/qrcode/selectAdminPageInfo")
           .then(json => {
             if (json.data.code !== CONSTANT.STATUSCODE.SUCCESS) {
               return CONSTANT.MESSAGEBOX(json.data.msg, 'error', () => {
@@ -223,24 +145,25 @@
       },
       addData()
       {
+
+        let that = this;
+
         let data = new FormData();
         if(this.add.imgFile!=="" ||this.add.imgFile!==null) {
           data.append("imgFile", this.add.imgFile);
         }
-        data.append("author",this.add.author);
-        data.append("ntitle",this.add.ntitle);
-        data.append("ndetail",this.add.ndetail);
         let config = {
           //添加请求头
           headers: { "Content-Type": "multipart/form-data" },
         };
-        this.axios.post("/admin/news/insert",data,config)
+
+        this.axios.post("/admin/qrcode/insert",data,config)
           .then((json)=>{
             if(json.data.code===CONSTANT.STATUSCODE.SUCCESS)
             {
               CONSTANT.MESSAGEBOX(json.data.message,"success",()=>{
                 jQuery('#addModal').modal('hide');
-                this.getNewsList();
+                this.getList();
               })
             }
             else
@@ -251,38 +174,39 @@
             }
           })
       },
-      getNews(data)
+      getData(data)
       {
         this.update=data;
-        this.updateeditor.txt.html(this.update.ndetail);
+        console.info(this.update)
         this.openModal("#updateModal");
       },
       /**
-       * 更新新闻信息
+       * 更新二维码
        */
-      updateNews()
+      updateData()
       {
+        let that=this;
+
         let data = new FormData();
         if(this.update.imgFile!=="" ||this.update.imgFile!==null) {
           data.append("imgFile", this.update.imgFile);
         }
-        data.append("coverimg",this.update.coverimg);
-        data.append("author",this.update.author);
-        data.append("ntitle",this.update.ntitle);
-        data.append("ndetail",this.update.ndetail);
-        data.append("nid",this.update.nid);
-
+        data.append("qid",this.update.qid);
+        data.append("qid",this.update.qid);
+        data.append("imgpath",this.update.imgpath);
         let config = {
           //添加请求头
           headers: { "Content-Type": "multipart/form-data" },
         };
-        this.axios.post("/admin/news/update",data,config)
+
+        this.axios.post("/admin/qrcode/update",data,config)
           .then((json)=>{
             if(json.data.code===CONSTANT.STATUSCODE.SUCCESS)
             {
               CONSTANT.MESSAGEBOX(json.data.message,"success",()=>{
                 jQuery('#updateModal').modal('hide');
-                this.getNewsList();
+                this.update.imgFile=''
+                this.getList();
               })
             }
             else
@@ -295,20 +219,20 @@
 
       },
       /**
-       * 删除新闻
-       * @param nid
+       * 删除二维码
+       * @param tid
        */
-      deleteNews(nid)
+      deleteData(qid)
       {
-        let flag = confirm("您确定要删除编号为["+nid+"]的新闻信息吗?");
+        let flag = confirm("您确定要删除编号为["+qid+"]的二维码吗?");
         if(flag)
         {
-          this.axios.get("/admin/news/delete?nid="+nid)
+          this.axios.get("/admin/qrcode/delete?qid="+qid)
             .then(json=>{
               if(json.data.code===CONSTANT.STATUSCODE.SUCCESS)
               {
                 CONSTANT.MESSAGEBOX(json.data.message,"success",()=>{
-                  this.getNewsList();
+                  this.getList();
                 })
               }
               else
