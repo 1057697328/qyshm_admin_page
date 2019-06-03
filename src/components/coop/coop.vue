@@ -7,7 +7,7 @@
 			<div class="col-12">
 				<button class="btn btn-info" @click="openModal('#addModal')"><i class="fa fa-newspaper"></i> 添加合作机构</button>
 			</div>
-			<div class="col-12" style="padding-top:1rem">
+			<div class="col-12" style="padding-top:1rem" v-if="isLoad">
 				<div class="table-responsive">
 					<table class="table table-hover">
 						<thead>
@@ -25,7 +25,7 @@
 							<tr v-for="item in pageData.rows">
 								<td>{{item.cid}}</td>
 								<td><img :src="CONSTANT.URL+item.coverimg" alt=""></td>
-								<td>{{item.qcoopType.ctypename}}</td>
+								<td>{{item.qcoopType!==null?item.qcoopType.ctypename:''}}</td>
 								<td>{{item.cname}}</td>
 								<td>{{item.engname}}</td>
 								<td>{{item.href}}</td>
@@ -34,6 +34,16 @@
 						</tbody>
 					</table>
 				</div>
+			</div>
+			<!-- 分页 -->
+			<div>
+				<nav aria-label="Page navigation example">
+					<ul class="pagination">
+						<li class="page-item"><a class="page-link" href="javascript:void(0)" @click="getPage(1)">首页</a></li>
+						<li class="page-item" v-for="num in pageData.totalPage"><a class="page-link" href="javascript:void(0)" @click="getPage(num)">{{num}}</a></li>
+						<li class="page-item"><a class="page-link" href="javascript:void(0)" @click="getPage(pageData.totalPage)">尾页</a></li>
+					</ul>
+				</nav>
 			</div>
 		</div>
 
@@ -158,6 +168,7 @@
 		name: "coop",
 		data() {
 			return {
+				isLoad:false,
 				add: {
 					href: '',
 					ctypeid: '',
@@ -172,13 +183,13 @@
 					cname: '',
 					engname: '',
 					imgFile: '',
-					coverimg:''
+					coverimg: ''
 				},
 				pageData: {
 
 				},
 				pageTypeData: {
-				
+
 				},
 				CONSTANT: CONSTANT
 			}
@@ -194,6 +205,7 @@
 						if (json.data.code === 200) {
 							this.pageData = json.data.result
 							console.info(this.pageData)
+							this.isLoad=true;
 						} else {
 							CONSTANT.MESSAGEBOX(json.data.msg, 'failed');
 							return false
@@ -275,6 +287,19 @@
 							}
 						})
 				}
+			},
+			// 获取分页数据
+			getPage(pageindex) {
+				this.axios.get("/admin/coop/selectAdminPageInfo?page=" + pageindex)
+					.then((json) => {
+						if (json.data.code === 200) {
+							this.pageData = json.data.result
+							console.info(this.pageData)
+						} else {
+							CONSTANT.MESSAGEBOX(json.data.msg, 'failed');
+							return false
+						}
+					})
 			},
 			/**
 			 * 获取

@@ -29,6 +29,16 @@
 					</table>
 				</div>
 			</div>
+				<!-- 分页 -->
+			<div>
+				<nav aria-label="Page navigation example">
+					<ul class="pagination">
+						<li class="page-item"><a class="page-link" href="javascript:void(0)" @click="getPage(1)">首页</a></li>
+						<li class="page-item" v-for="num in pageData.totalPage"><a class="page-link" href="javascript:void(0)" @click="getPage(num)">{{num}}</a></li>
+						<li class="page-item"><a class="page-link" href="javascript:void(0)" @click="getPage(pageData.totalPage)">尾页</a></li>
+					</ul>
+				</nav>
+			</div>
 		</div>
 
 
@@ -184,6 +194,19 @@
 		methods: {
 			getProductList() {
 				this.axios.get("/admin/product/selectAdminPageInfo")
+					.then((json) => {
+						if (json.data.code === 200) {
+							this.pageData = json.data.result
+							console.info(this.pageData)
+						} else {
+							CONSTANT.MESSAGEBOX(json.data.msg, 'failed');
+							return false
+						}
+					})
+			},
+				// 获取分页数据
+			getPage(pageindex) {
+				this.axios.get("/admin/product/selectAdminPageInfo?page=" + pageindex)
 					.then((json) => {
 						if (json.data.code === 200) {
 							this.pageData = json.data.result
