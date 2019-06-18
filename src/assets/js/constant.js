@@ -1,6 +1,6 @@
 import swal from 'sweetalert'
 const CONSTANT={
-  URL:"http://127.0.0.1:8080",
+  URL:"http://www.qyshm.net",
   STATUSCODE:{
     SUCCESS:200,
     FAILED:500,

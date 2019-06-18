@@ -19,7 +19,7 @@ import CONSTANT from '@/assets/js/constant'
 import swal from 'sweetalert'
 
 
-axios.defaults.baseURL="http://127.0.0.1:8080";
+axios.defaults.baseURL="http://www.qyshm.net";
 
 
 Vue.use(VueAxios,axios);

@@ -50,7 +50,7 @@
 
 		<!--新增Modal-->
 		<div id="addModal" class="modal" tabindex="-1" role="dialog">
-			<div class="modal-dialog" role="document">
+			<div class="modal-dialog modal-lg" role="document">
 				<div class="modal-content">
 					<div class="modal-header">
 						<h5 class="modal-title">添加合作机构</h5>
@@ -92,6 +92,12 @@
 									<input type="text" v-model="add.href" class="form-control" placeholder="请输入单击合作机构后跳转的链接地址" />
 								</div>
 							</div>
+              <div class="col-12">
+                <div class="form-group">
+                  <label>合作机构介绍</label>
+                  <div ref="addeditor"></div>
+                </div>
+              </div>
 						</div>
 					</div>
 					<div class="modal-footer">
@@ -105,7 +111,7 @@
 
 		<!--修改Modal-->
 		<div id="updateModal" class="modal" tabindex="-1" role="dialog">
-			<div class="modal-dialog" role="document">
+			<div class="modal-dialog modal-lg" role="document">
 				<div class="modal-content">
 					<div class="modal-header">
 						<h5 class="modal-title">修改合作机构</h5>
@@ -147,6 +153,12 @@
 									<input type="text" v-model="update.href" class="form-control" placeholder="请输入单击合作机构后跳转的链接地址" />
 								</div>
 							</div>
+              <div class="col-12">
+                <div class="form-group">
+                  <label>合作机构介绍</label>
+                  <div ref="updateeditor"></div>
+                </div>
+              </div>
 						</div>
 					</div>
 					<div class="modal-footer">
@@ -163,6 +175,7 @@
 
 <script>
 	import CONSTANT from "@/assets/js/constant";
+  import E from 'wangeditor'
 
 	export default {
 		name: "coop",
@@ -191,10 +204,34 @@
 				pageTypeData: {
 
 				},
-				CONSTANT: CONSTANT
+				CONSTANT: CONSTANT,
+        addeditor:null,
+        updateeditor:null
 			}
 		},
 		mounted() {
+
+      let that=this;
+
+      this.addeditor = new E(this.$refs.addeditor);
+      this.addeditor.customConfig.uploadImgServer=CONSTANT.URL+"/file/upload";
+      this.addeditor.customConfig.uploadFileName="files";
+      this.addeditor.customConfig.onchange=(html)=>{
+        this.add.ndetail=html
+        this.$emit('change', this.add.ndetail)
+      }
+
+      this.updateeditor = new E(this.$refs.updateeditor);
+      this.updateeditor.customConfig.uploadImgServer=CONSTANT.URL+"/file/upload";
+      this.updateeditor.customConfig.uploadFileName="files";
+      this.updateeditor.customConfig.onchange=(html)=>{
+        that.update.ndetail=html
+        this.$emit('change', this.update.ndetail)
+      }
+
+      this.addeditor.create();
+      this.updateeditor.create();
+
 			this.getCoopList();
 			this.getCoopTypeList();
 		},
@@ -247,6 +284,7 @@
 				data.append("engname", this.add.engname);
 				data.append("href", this.add.href);
 				data.append("imgFile", this.add.imgFile);
+				data.append("ctedail",this.addeditor.txt.html())
 				let config = {
 					//添加请求头
 					headers: {
@@ -306,6 +344,7 @@
 			 */
 			getCoop(data) {
 				this.update = data;
+				this.updateeditor.txt.html(data.ctedail);
 				this.openModal("#updateModal");
 			},
 			/**
@@ -318,6 +357,7 @@
 				data.append("cname", this.update.cname);
 				data.append("engname", this.update.engname);
 				data.append("href", this.update.href);
+        data.append("ctedail",this.updateeditor.txt.html())
 				if (this.update.coverimg) {
 					data.append("coverimg", this.update.coverimg);
 				}

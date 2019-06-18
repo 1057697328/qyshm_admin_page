@@ -21,7 +21,7 @@
             <tbody>
               <tr v-for="item in pageData.rows">
                 <td>{{item.bid}}</td>
-                <td><img :src="CONSTANT.URL+item.imgpath" alt=""></td>
+                <td><img :src="CONSTANT.URL+item.imgpath" alt="" style="width:50%;"></td>
                 <td>{{item.href}}</td>
                 <td><button class="btn btn-info" @click="getBanner(item)">编辑</button> <button class="btn btn-danger" @click="deleteBanner(item.bid)">删除轮播</button></td>
               </tr>
